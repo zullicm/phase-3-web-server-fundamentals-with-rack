@@ -106,30 +106,22 @@ rackup config.ru
 Rack will print out something like:
 
 ```text
-Puma starting in single mode...
-* Puma version: 5.3.2 (ruby 2.6.3-p62) ("Sweetnighter")
-*  Min threads: 0
-*  Max threads: 5
-*  Environment: development
-*          PID: 11825
-* Listening on http://127.0.0.1:9292
-* Listening on http://[::1]:9292
-Use Ctrl-C to stop
+[2021-07-19 16:38:10] INFO  WEBrick 1.4.2
+[2021-07-19 16:38:10] INFO  ruby 2.6.3 (2019-04-16) [universal.x86_64-darwin20]
+[2021-07-19 16:38:10] INFO  WEBrick::HTTPServer#start: pid=34006 port=9292
 ```
 
-Try visiting `http://127.0.0.1:9292` in your browser. This will send a GET
+Try visiting `http://localhost:9292` in your browser. This will send a GET
 request to your Rack server, and you should see the HTML response of
 `Hello World` appear!
 
 Let's deconstruct this URL a little bit though. The URL is
-`http://127.0.0.1:9292/`. The protocol is `http`. That makes sense, but the
-domain is `127.0.0.1:9292`. What's going on there?
+`http://localhost:9292/`. The protocol is `http`. That makes sense, but the
+domain is `localhost:9292`. What's going on there?
 
-`127.0.0.1` is normally where a domain name like `google.com` goes. In this
-case, since you are running the server on your computer, `127.0.0.1` is your
-internal IP address. You can also refer to this address using `localhost` (so
-visiting `http://localhost:9292/` will also result in the same request being
-made to your Rack server).
+`localhost` is normally where a domain name like `google.com` goes. In this
+case, since you are running the server on your computer, `localhost` refers to
+the internal address of your computer.
 
 The last part of that URL is the `:9292` section. This the "port number" of your
 server. You may want to run multiple servers on one computer (for example, one
