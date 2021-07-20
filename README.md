@@ -55,7 +55,7 @@ Our goal with any web server is to be able to **receive a request** and **send a
 response**.
 
 To accomplish this with Rack, we need to create a class that responds to a
-single method: `#call`. All this method needs to do is return an `Array` with
+single method: `#call`. All this method needs to do is return an array with
 three elements:
 
 - An [HTTP Status code][http-status] (where `200` is used for `OK`)
