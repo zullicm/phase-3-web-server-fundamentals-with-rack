@@ -9,10 +9,10 @@
 
 How does a web server work?
 
-We open a browser and it uses HTTP to connect to a remote server. Servers are
-just code. But somehow when you say `/search?item=shoes&size=13M`, it knows how
-to find some more code that knows how to search (in this case, for shoes of size
-13M).
+We open a browser and it uses HTTP to send a message to a server. Servers are
+just computers running code that waits for requests and sends back responses.
+But when you say `/search?item=shoes&size=13M`, how does it know to run the code
+to search for shoes of size 13M?
 
 All web servers have a core architecture in common. By looking at that
 architecture, we can build a mental model for how all web servers work. As an
@@ -27,10 +27,10 @@ In the same way, we can say that all web servers work like this:
 > run some conditional logic to find out which stuff to send back in the
 > response"
 
-In Ruby, this idea of "a common core architecture for all web-server like
-things" is captured in a gem called Rack. Rails, which you'll learn in Phase 4,
-"rides on top of" Rack. Sinatra, which you'll learn in the coming lessons,
-"rides on top of" Rack too.
+In Ruby, this idea of "a core architecture" for all web-server like things is
+captured in a gem called Rack. Rails, which you'll learn in Phase 4, "rides on
+top of" Rack. Sinatra, which you'll learn in the coming lessons, "rides on top
+of" Rack too.
 
 In fact, the idea of a base, common web-server library was such a good idea,
 other languages like Python and JavaScript (via the NodeJS environment)
@@ -38,8 +38,8 @@ implemented their own "base" web server. By understanding the core mechanics of
 how a server works in Ruby, you'll have a **much** easier time learning how to
 work with servers in those other languages.
 
-Before we get to the complexity of things built on top of Rack, let's get a
-simple server working on Rack.
+Before we get to the complexity of things built _on top of Rack_, let's get a
+simple server working on Rack by itself.
 
 **Note**: We'll be moving on from Rack shortly, so don't worry too much about
 understanding the exact syntax in this lesson. Focus on the concepts.
@@ -55,19 +55,25 @@ Our goal with any web server is to be able to **receive a request** and **send a
 response**.
 
 To accomplish this with Rack, we need to create a class that responds to a
-single method: `#call`. All this method needs to do is return an `Array` with
+single method: `#call`. All this method needs to do is return an array with
 three elements:
 
-- An [HTTP Status code][http-status] (where `200` is used for `OK`)
-- A HTTP Headers hash with a `"Content-Type"` key that returns the value (for
-  HTML-based documents) of `text/html`
-- An **array** of strings to send back in the body of the response (in our case, we can format
-  the string like HTML: `"<p>Like this!</p>"`)
+- A [**status code**][http-status] (where `200` is used for `OK`)
+- A **response headers** hash with a `"Content-Type"` key that returns the
+  value of `text/html` (for HTML-based responses)
+- An array of strings to send back in the **body** of the response (in our case,
+  we can format the string like HTML: `"<p>Like this!</p>"`)
 
-Here's a sample that returns a HTML string:
+Essentially, we need the `#call` method to return something like this:
 
-```ruby
-[200, {"Content-Type" => "text/html"}, ["<h2>Hello <em>World</em>!</h2>"]]
+```txt
+[status code, headers hash, response body]
+```
+
+Here's an example that returns a HTML string:
+
+```rb
+[200, { "Content-Type" => "text/html" }, ["<h2>Hello <em>World</em>!</h2>"]]
 ```
 
 ## Creating a Rack-Based Web Server
@@ -78,14 +84,16 @@ below instructions.
 Let's create a file called `config.ru`. Files that are used by Rack end with
 `.ru` instead of `.rb` because they're normally loaded with a command called
 `rackup`. It's a way to indicate to other developers that this is our server
-definition file. Add this code to the `config.ru` file:
+definition file.
+
+Add this code to the `config.ru` file:
 
 ```ruby
 require 'rack'
 
 class App
   def call(env)
-    [200, {"Content-Type" => "text/html"}, ["<h2>Hello <em>World</em>!</h2>"]]
+    [200, { "Content-Type" => "text/html" }, ["<h2>Hello <em>World</em>!</h2>"]]
   end
 end
 
@@ -111,6 +119,11 @@ Rack will print out something like:
 [2021-07-19 16:38:10] INFO  WEBrick::HTTPServer#start: pid=34006 port=9292
 ```
 
+> WEBrick is a Ruby library that provides a simple HTTP server. Rack needs a web
+> server to to handle connections, and WEBrick is the default since it's
+> included with Ruby. Later, we'll be replacing this with another more powerful
+> Ruby server, Thin.
+
 Try visiting `http://localhost:9292` in your browser. This will send a GET
 request to your Rack server, and you should see the HTML response of
 `Hello World` appear!
@@ -128,17 +141,17 @@ server. You may want to run multiple servers on one computer (for example, one
 for React and one for Sinatra) and having different ports allows them to be
 running simultaneously without conflicting.
 
-The resource that you are requesting is `/`. This is effectively like saying the
-home or default. If you're doing local development, you should be able to go to
-`http://localhost:9292/` and see _Hello_ printed out by your web server!
+The path, or resource, that you are requesting is `/`. This is effectively like
+saying the home or default path. You should be able to go to
+`http://localhost:9292/` and see `Hello World` printed out by your web server!
 
 Feel free to change `config.ru` to add changes to your web server. If you make
-changes to `config.ru` **_you'll have to shut down the server (Control-C) and
-re-start it to see the changes_**.
+changes to `config.ru` **you'll have to shut down the server (`control + c`) and
+re-start it to see the changes**.
 
-We can also access different information about the request object by using the
-`env` argument that is passed into the `call` method. Try adding a `binding.pry`
-to the `#call` method:
+We can also access different information about the **request** object by using
+the `env` argument that is passed into the `call` method. Try adding a
+`binding.pry` to the `#call` method:
 
 ```rb
 require 'rack'
@@ -167,7 +180,8 @@ env["PATH_INFO"]
 ```
 
 From here, it's not too much of a leap to see how we could make our server more
-dynamic and set it up to send back different responses based on the **path**.
+dynamic and set it up to send back **different responses** based on the
+**path**.
 
 For example:
 
@@ -182,7 +196,7 @@ class App
     if path == "/"
       [200, { "Content-Type" => "text/html" }, ["<h2>Hello <em>World</em>!</h2>"]]
     elsif path == "/potato"
-      [200, { "Content-Type" => "text/html" }, ["<p>Boil 'em, mash 'em, stick 'em in a ]stew</p>"]
+      [200, { "Content-Type" => "text/html" }, ["<p>Boil 'em, mash 'em, stick 'em in a stew</p>"]
     else
       [404, { "Content-Type" => "text/html" }, ["Page not found"]]
     end
