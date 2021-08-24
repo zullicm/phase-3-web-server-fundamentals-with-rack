@@ -120,9 +120,9 @@ Rack will print out something like:
 ```
 
 > WEBrick is a Ruby library that provides a simple HTTP server. Rack needs a web
-> server to to handle connections, and WEBrick is the default since it's
-> included with Ruby. Later, we'll be replacing this with another more powerful
-> Ruby server, Thin.
+> server to handle connections, and WEBrick is the default since it's included
+> with Ruby. Later, we'll be replacing this with another more powerful Ruby
+> server, Thin.
 
 Try visiting `http://localhost:9292` in your browser. This will send a GET
 request to your Rack server, and you should see the HTML response of
