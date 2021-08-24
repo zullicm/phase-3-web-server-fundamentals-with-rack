@@ -107,8 +107,8 @@ appropriate **response**.
 
 Run this code from the command line:
 
-```sh
-rackup config.ru
+```console
+$ rackup config.ru
 ```
 
 Rack will print out something like:
