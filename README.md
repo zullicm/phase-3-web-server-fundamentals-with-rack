@@ -27,7 +27,7 @@ In the same way, we can say that all web servers work like this:
 > run some conditional logic to find out which stuff to send back in the
 > response"
 
-In Ruby, this idea of "a core architecture" for all web-server like things is
+In Ruby, this idea of "a core architecture" for all web-server-like things is
 captured in a gem called Rack. Rails, which you'll learn in Phase 4, "rides on
 top of" Rack. Sinatra, which you'll learn in the coming lessons, "rides on top
 of" Rack too.
@@ -70,7 +70,7 @@ Essentially, we need the `#call` method to return something like this:
 [status code, headers hash, response body]
 ```
 
-Here's an example that returns a HTML string:
+Here's an example that returns an HTML string:
 
 ```rb
 [200, { "Content-Type" => "text/html" }, ["<h2>Hello <em>World</em>!</h2>"]]
@@ -79,7 +79,7 @@ Here's an example that returns a HTML string:
 ## Creating a Rack-Based Web Server
 
 With this goal in mind, let's create a basic web server. Follow along with the
-below instructions.
+instructions below.
 
 Let's create a file called `config.ru`. Files that are used by Rack end with
 `.ru` instead of `.rb` because they're normally loaded with a command called
